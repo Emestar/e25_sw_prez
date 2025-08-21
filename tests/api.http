@@ -2,20 +2,19 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 
-### 1. GET - Obtenir tous les produits (liste vide au début)
-GET {{baseUrl}}/api/products
+### 1. GET - Obtenir tous les tâches (liste vide au début)
+GET {{baseUrl}}/api/tasks
 
-### 2. POST - Ajouter le premier produit
-POST {{baseUrl}}/api/products
+### 2. POST - Ajouter le premier tâche
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
-  "name": "MacBook Air M2",
-  "price": 1299.99
+  "title": "tache 1"
 }
 
-### 3. POST - Ajouter un deuxième produit
-POST {{baseUrl}}/api/products
+### 3. POST - Ajouter un deuxième tâche
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
@@ -23,8 +22,8 @@ Content-Type: {{contentType}}
   "price": 899.99
 }
 
-### 4. POST - Ajouter un troisième produit
-POST {{baseUrl}}/api/products
+### 4. POST - Ajouter un troisième tâche
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
@@ -32,45 +31,44 @@ Content-Type: {{contentType}}
   "price": 279.99
 }
 
-### 5. GET - Vérifier que tous les produits sont listés
-GET {{baseUrl}}/api/products
+### 5. GET - Vérifier que tous les tâches sont listés
+GET {{baseUrl}}/api/tasks
 
-### 6. GET - Obtenir un produit par ID (bonus)
-GET {{baseUrl}}/api/products/1
+### 6. GET - Obtenir un tâche par ID (bonus)
+GET {{baseUrl}}/api/tasks/1
 
-### 7. PUT - Modifier le premier produit
-PUT {{baseUrl}}/api/products/1
+### 7. PUT - Modifier le premier tâche
+PUT {{baseUrl}}/api/tasks/1
 Content-Type: {{contentType}}
 
 {
-  "name": "MacBook Air M2 - Edition Spéciale",
-  "price": 1399.99
+  "name": "MacBook Air M2 - Edition Spéciale"
 }
 
-### 8. GET - Vérifier que le produit a été modifié
-GET {{baseUrl}}/api/products/1
+### 8. GET - Vérifier que le tâche a été modifié
+GET {{baseUrl}}/api/tasks/1
 
-### 9. DELETE - Supprimer le produit avec ID 2
-DELETE {{baseUrl}}/api/products/2
+### 9. DELETE - Supprimer le tâche avec ID 2
+DELETE {{baseUrl}}/api/tasks/2
 
-### 10. GET - Vérifier que le produit a été supprimé
-GET {{baseUrl}}/api/products
+### 10. GET - Vérifier que le tâche a été supprimé
+GET {{baseUrl}}/api/tasks
 
-### 11. DELETE - Supprimer le produit avec ID 1
-DELETE {{baseUrl}}/api/products/1
+### 11. DELETE - Supprimer le tâche avec ID 1
+DELETE {{baseUrl}}/api/tasks/1
 
-### 12. DELETE - Supprimer le produit avec ID 3
-DELETE {{baseUrl}}/api/products/3
+### 12. DELETE - Supprimer le tâche avec ID 3
+DELETE {{baseUrl}}/api/tasks/3
 
 ### 13. GET - Vérifier que la liste est vide
-GET {{baseUrl}}/api/products
+GET {{baseUrl}}/api/tasks
 
 ###
 ### TESTS D'ERREURS
 ###
 
 ### Erreur 1 - POST sans nom
-POST {{baseUrl}}/api/products
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
@@ -78,16 +76,16 @@ Content-Type: {{contentType}}
 }
 
 ### Erreur 2 - POST avec prix négatif
-POST {{baseUrl}}/api/products
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
-  "name": "Produit test",
+  "name": "Tâche test",
   "price": -50
 }
 
 ### Erreur 3 - POST avec nom vide
-POST {{baseUrl}}/api/products
+POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
@@ -96,42 +94,39 @@ Content-Type: {{contentType}}
 }
 
 ### Erreur 4 - DELETE avec ID inexistant
-DELETE {{baseUrl}}/api/products/999
+DELETE {{baseUrl}}/api/tasks/999
 
 ### Erreur 5 - DELETE avec ID invalide
-DELETE {{baseUrl}}/api/products/abc
+DELETE {{baseUrl}}/api/tasks/abc
 
 ### Erreur 6 - GET avec ID inexistant
-GET {{baseUrl}}/api/products/999
+GET {{baseUrl}}/api/tasks/999
 
 ### Erreur 7 - PUT avec ID inexistant
-PUT {{baseUrl}}/api/products/999
+PUT {{baseUrl}}/api/tasks/999
 Content-Type: {{contentType}}
 
 {
-  "name": "Produit inexistant",
-  "price": 199.99
+  "name": "Tâche inexistant"
 }
 
 ### Erreur 8 - PUT avec nom vide
-PUT {{baseUrl}}/api/products/1
+PUT {{baseUrl}}/api/tasks/1
 Content-Type: {{contentType}}
 
 {
   "name": "",
-  "price": 299.99
 }
 
 ### Erreur 9 - PUT avec prix négatif
-PUT {{baseUrl}}/api/products/1
+PUT {{baseUrl}}/api/tasks/1
 Content-Type: {{contentType}}
 
 {
-  "name": "Produit test",
-  "price": -50
+  "name": "Tâche test"
 }
 
 ### 11. Test COUNT - Compter tous les produits
-GET {{baseUrl}}/api/products/count
+GET {{baseUrl}}/api/tasks/count
 
 

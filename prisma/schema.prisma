@@ -9,16 +9,15 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
- 
+
 model Task {
   id        Int      @id @default(autoincrement())
   title     String   @unique
-  description String
-  status  String
-  priority      String   @default("user")
-  dueDate DateTime
+  description String?
+  status  String?
+  priority      String?
+  dueDate DateTime?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
- 
+
   @@map("tasks")
 }

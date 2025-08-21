@@ -14,12 +14,8 @@ const options = {
     },
     servers: [
       {
-        url: process.env.NODE_ENV === 'production' 
-          ? 'https://next-01-evaluation-du-lab2.vercel.app'
-          : 'http://localhost:3000',
-        description: process.env.NODE_ENV === 'production' 
-          ? 'Serveur de production' 
-          : 'Serveur de développement'
+        url:'http://localhost:3000',
+        description: 'Serveur de développement'
       }
     ],
     components: {

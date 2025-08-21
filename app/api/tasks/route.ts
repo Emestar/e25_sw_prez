@@ -5,15 +5,15 @@ import { prisma } from '@/lib/prisma'
  * @swagger
  * /api/products:
  *   get:
- *     summary: Récupérer la liste de tous les produits
+ *     summary: Récupérer la liste de tous les tâches
  *     description: |
- *       Retourne la liste complète de tous les produits enregistrés en base de données,
+ *       Retourne la liste complète de tous les tâches enregistrées en base de données,
  *       triés par date de création décroissante (plus récent en premier).
  *     tags:
- *       - Produits
+ *       - tâches
  *     responses:
  *       200:
- *         description: Liste des produits récupérée avec succès
+ *         description: Liste des tâches récupérée avec succès
  *         content:
  *           application/json:
  *             schema:
@@ -28,16 +28,16 @@ import { prisma } from '@/lib/prisma'
  *                     $ref: '#/components/schemas/Product'
  *                 message:
  *                   type: string
- *                   example: "3 produit(s) trouvé(s)"
+ *                   example: "3 tâche(s) trouvé(s)"
  *             examples:
  *               liste_vide:
  *                 summary: Liste vide
  *                 value:
  *                   success: true
  *                   data: []
- *                   message: "0 produit(s) trouvé(s)"
- *               liste_avec_produits:
- *                 summary: Liste avec produits
+ *                   message: "0 tâche(s) trouvé(s)"
+ *               liste_avec_taches:
+ *                 summary: Liste avec tâches
  *                 value:
  *                   success: true
  *                   data:
@@ -51,7 +51,7 @@ import { prisma } from '@/lib/prisma'
  *                       price: 1299.99
  *                       createdAt: "2024-01-15T10:25:00.000Z"
  *                       updatedAt: "2024-01-15T10:25:00.000Z"
- *                   message: "2 produit(s) trouvé(s)"
+ *                   message: "2 tâche(s) trouvé(s)"
  *       500:
  *         description: Erreur serveur lors de la récupération
  *         content:
@@ -60,11 +60,11 @@ import { prisma } from '@/lib/prisma'
  *               $ref: '#/components/schemas/ErrorResponse'
  *             example:
  *               success: false
- *               error: "Erreur lors de la récupération des produits"
+ *               error: "Erreur lors de la récupération des tâches"
  */
 export async function GET() {
   try {
-    const products = await prisma.product.findMany({
+    const tasks = await prisma.task.findMany({
       orderBy: {
         createdAt: 'desc'
       }
@@ -72,15 +72,15 @@ export async function GET() {
     
     return NextResponse.json({
       success: true,
-      data: products,
-      message: `${products.length} produit(s) trouvé(s)`
+      data: tasks,
+      message: `${tasks.length} tâche(s) trouvée(s)`
     })
   } catch (error) {
-    console.error('Erreur lors de la récupération des produits:', error)
+    console.error('Erreur lors de la récupération des tâches:', error)
     return NextResponse.json(
       {
         success: false,
-        error: 'Erreur lors de la récupération des produits'
+        error: 'Erreur lors de la récupération des tâches'
       },
       { status: 500 }
     )
@@ -96,7 +96,7 @@ export async function GET() {
  *       Crée un nouveau produit en base de données après validation des données.
  *       Le nom doit être une chaîne non vide et le prix un nombre positif.
  *     tags:
- *       - Produits
+ *       - Tâches
  *     requestBody:
  *       required: true
  *       content:
@@ -129,7 +129,7 @@ export async function GET() {
  *                   $ref: '#/components/schemas/Product'
  *                 message:
  *                   type: string
- *                   example: "Produit créé avec succès"
+ *                   example: "Tâche créé avec succès"
  *             example:
  *               success: true
  *               data:
@@ -138,7 +138,7 @@ export async function GET() {
  *                 price: 1199.99
  *                 createdAt: "2024-01-15T10:30:00.000Z"
  *                 updatedAt: "2024-01-15T10:30:00.000Z"
- *               message: "Produit créé avec succès"
+ *               message: "Tâche créé avec succès"
  *       400:
  *         description: Données invalides
  *         content:
@@ -150,7 +150,7 @@ export async function GET() {
  *                 summary: Nom manquant
  *                 value:
  *                   success: false
- *                   error: "Le nom du produit est requis et doit être une chaîne non vide"
+ *                   error: "Le titre de la tâche est requis et doit être une chaîne non vide"
  *               prix_invalide:
  *                 summary: Prix invalide
  *                 value:
@@ -164,56 +164,75 @@ export async function GET() {
  *               $ref: '#/components/schemas/ErrorResponse'
  *             example:
  *               success: false
- *               error: "Erreur lors de la création du produit"
+ *               error: "Erreur lors de la création de la tâche"
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, price } = body
+    const { title, description, status, priority, dueDate } = body
 
     // Validation des données
-    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Le nom du produit est requis et doit être une chaîne non vide'
+          error: 'Le titre de la tâche est requis et doit être une chaîne non vide'
         },
         { status: 400 }
       )
     }
 
-    if (!price || typeof price !== 'number' || price <= 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Le prix doit être un nombre positif'
-        },
-        { status: 400 }
-      )
-    }
+    // if (!priority || typeof priority !== 'string' || priority.trim().length === 0) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       error: 'La priorite de la tâche est requis et doit être une chaîne non vide'
+    //     },
+    //     { status: 400 }
+    //   )
+    // }
 
-    // Créer le produit
-    const product = await prisma.product.create({
+    // if (!price || typeof price !== 'number' || price <= 0) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       error: 'Le prix doit être un nombre positif'
+    //     },
+    //     { status: 400 }
+    //   )
+    // }
+
+    // Créer la tâche
+    // const task = await prisma.task.create({
+    //   data: {
+    //     title: title.trim()
+    //   }
+    // })
+
+    const task = await prisma.task.create({
       data: {
-        name: name.trim(),
-        price: price
+        title: title.trim(),
+        description: description,
+        status: status,
+        priority: priority,
+        dueDate: dueDate
       }
     })
 
     return NextResponse.json(
       {
         success: true,
-        data: product,
-        message: 'Produit créé avec succès'
+        data: task,
+        message: 'Tâche créé avec succès'
       },
       { status: 201 }
     )
   } catch (error) {
-    console.error('Erreur lors de la création du produit:', error)
+    console.error('Erreur lors de la création de la tâche:', error)
     return NextResponse.json(
       {
         success: false,
-        error: 'Erreur lors de la création du produit'
+        error: 'Erreur lors de la création du tâche'
       },
       { status: 500 }
     )
