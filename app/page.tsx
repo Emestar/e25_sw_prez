@@ -6,22 +6,22 @@ export default function Home() {
       </h1>
                   <div className="space-y-4">
               <p>
-                Cette application propose des services web REST pour gérer des produits :
+                Cette application propose des services web REST pour gérer des tâches :
               </p>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Services principaux</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>GET /api/products</strong> - Obtenir la liste des produits</li>
-                    <li><strong>POST /api/products</strong> - Ajouter un nouveau produit</li>
-                    <li><strong>PUT /api/products/[id]</strong> - Modifier un produit par ID</li>
-                    <li><strong>DELETE /api/products/[id]</strong> - Supprimer un produit par ID</li>
+                    <li><strong>GET /api/tasks</strong> - Obtenir la liste des tâches</li>
+                    <li><strong>POST /api/tasks</strong> - Ajouter une nouvelle tâche</li>
+                    <li><strong>PUT /api/tasks/[id]</strong> - Modifier une tâche par ID</li>
+                    <li><strong>DELETE /api/tasks/[id]</strong> - Supprimer une tâche par ID</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Services complémentaires</h3>
                   <ul className="list-disc list-inside space-y-2">
-                    <li><strong>GET /api/products/count</strong> - Compter les produits</li>
+                    <li><strong>GET /api/tasks/count</strong> - Compter les taches</li>
                   </ul>
                 </div>
               </div>
@@ -29,7 +29,7 @@ export default function Home() {
           Utilisez Postman ou un autre client REST pour tester ces endpoints.
         </p>
         <p className="mt-2">
-          Interface web: <a className="underline" href="/products">/products</a>
+          Interface web: <a className="underline" href="/tasks">/tasks</a>
         </p>
       </div>
     </main>

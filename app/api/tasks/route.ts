@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 /**
  * @swagger
- * /api/products:
+ * /api/tasks:
  *   get:
  *     summary: Récupérer la liste de tous les tâches
  *     description: |
@@ -25,7 +25,7 @@ import { prisma } from '@/lib/prisma'
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/Product'
+ *                     $ref: '#/components/schemas/task'
  *                 message:
  *                   type: string
  *                   example: "3 tâche(s) trouvé(s)"
@@ -182,33 +182,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // if (!priority || typeof priority !== 'string' || priority.trim().length === 0) {
+    // if (dueDate !== undefined && dueDate !== null && dueDate !== '') {
     //   return NextResponse.json(
     //     {
     //       success: false,
-    //       error: 'La priorite de la tâche est requis et doit être une chaîne non vide'
+    //       error: 'dueDate doit être une date'
     //     },
     //     { status: 400 }
     //   )
     // }
 
-    // if (!price || typeof price !== 'number' || price <= 0) {
-    //   return NextResponse.json(
-    //     {
-    //       success: false,
-    //       error: 'Le prix doit être un nombre positif'
-    //     },
-    //     { status: 400 }
-    //   )
-    // }
-
+    
     // Créer la tâche
-    // const task = await prisma.task.create({
-    //   data: {
-    //     title: title.trim()
-    //   }
-    // })
-
     const task = await prisma.task.create({
       data: {
         title: title.trim(),
