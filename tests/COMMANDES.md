@@ -24,7 +24,7 @@ npx prisma db push
 npm run dev
 ```
 
-## Test avec curl
+## Test avec curl (Linux/Mac)
 
 ```bash
 # Créer une tâche
@@ -70,6 +70,58 @@ curl http://localhost:3000/api/tasks/by-priority?priority=HIGH
 
 # Obtenir les tâches en retard
 curl http://localhost:3000/api/tasks/Overdue
+```
+
+## Test avec PowerShell (Windows)
+
+```powershell
+# Créer une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{
+    "title": "Réviser le cours de Services Web",
+    "description": "Relire les chapitres 1 à 5 et faire les exercices pratiques",
+    "priority": "MEDIUM"
+  }'
+
+# Créer une tâche urgente avec date d'échéance
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{
+    "title": "Présentation finale du projet",
+    "description": "Préparer la présentation PowerPoint et répéter le discours",
+    "priority": "URGENT",
+    "dueDate": "2024-12-20T14:00:00"
+  }'
+
+# Lister toutes les tâches
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET
+
+# Obtenir une tâche par ID
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method GET
+
+# Modifier le statut d'une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "IN_PROGRESS"}'
+
+# Marquer une tâche comme terminée
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "COMPLETED"}'
+
+# Supprimer une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method DELETE
+
+# Obtenir les tâches par priorité
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/by-priority?priority=HIGH" -Method GET
+
+# Obtenir les tâches en retard
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/Overdue" -Method GET
 ```
 
 ## Test avec fichier .http
@@ -247,4 +299,48 @@ curl -s -X DELETE http://localhost:3000/api/tasks/1 | json_pp
 
 echo -e "\n9. Liste finale:"
 curl -s http://localhost:3000/api/tasks | json_pp
+```
+
+## Script de test complet avec PowerShell
+
+Créez un fichier `test-tasks.ps1` :
+
+```powershell
+Write-Host "=== Test du Gestionnaire de Tâches ===" -ForegroundColor Green
+
+Write-Host "1. Liste initiale (vide):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n2. Créer tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"title": "Réviser Services Web", "priority": "MEDIUM"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n3. Créer tâche 2 (urgente):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"title": "Présentation finale", "priority": "URGENT", "dueDate": "2024-12-20T14:00:00"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n4. Liste après création:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n5. Modifier statut tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "IN_PROGRESS"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n6. Tâches par priorité (URGENT):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/by-priority?priority=URGENT" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n7. Tâches en retard:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/Overdue" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n8. Supprimer tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method DELETE | Select-Object -ExpandProperty Content
+
+Write-Host "`n9. Liste finale:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
 ```
