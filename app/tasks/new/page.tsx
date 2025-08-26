@@ -35,8 +35,8 @@ export default function NewProductPage() {
 
   return (
     <main className="container mx-auto p-8 max-w-lg">
-      <h1 className="text-2xl font-semibold mb-6">Nouveau produit</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <h1 className="text-2xl font-semibold mb-6">Nouveau tâche</h1>
+      {/* <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-1">Nom</label>
           <input className="border rounded w-full p-2" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -49,7 +49,7 @@ export default function NewProductPage() {
         <button disabled={submitting} className="bg-black text-white px-4 py-2 rounded">
           {submitting ? "En cours..." : "Créer"}
         </button>
-      </form>
+      </form> */}
     </main>
   )
 }

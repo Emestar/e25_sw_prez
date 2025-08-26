@@ -58,7 +58,7 @@ export default function TasksPage() {
       {error && <p className="text-red-600">{error}</p>}
 
       {!loading && tasks.length === 0 && (
-        <p>Aucunw tâche.</p>
+        <p>Aucune tâche.</p>
       )}
 
       <ul className="space-y-3">
