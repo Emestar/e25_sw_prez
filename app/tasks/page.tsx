@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 
-type Product = {
+type Task = {
   id: number
   name: string
   price: number
@@ -11,20 +11,20 @@ type Product = {
   updatedAt: string
 }
 
-export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([])
+export default function TasksPage() {
+  const [tasks, setTasks] = useState<Task[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
   async function load() {
     try {
       setLoading(true)
-      const res = await fetch("/api/products", { cache: "no-store" })
+      const res = await fetch("/api/tasks", { cache: "no-store" })
       const json = await res.json()
       if (!res.ok || json.success !== true) {
         throw new Error(json.error || "Erreur lors du chargement")
       }
-      setProducts(json.data as Product[])
+      setTasks(json.data as Task[])
     } catch (e: any) {
       setError(e.message)
     } finally {
@@ -37,8 +37,8 @@ export default function ProductsPage() {
   }, [])
 
   async function handleDelete(id: number) {
-    if (!confirm("Supprimer ce produit ?")) return
-    const res = await fetch(`/api/products/${id}`, { method: "DELETE" })
+    if (!confirm("Supprimer cette tâche ?")) return
+    const res = await fetch(`/api/tasks/${id}`, { method: "DELETE" })
     if (res.ok) {
       await load()
     } else {
@@ -50,27 +50,26 @@ export default function ProductsPage() {
   return (
     <main className="container mx-auto p-8">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-semibold">Produits</h1>
-        <Link className="underline" href="/products/new">Nouveau produit</Link>
+        <h1 className="text-2xl font-semibold">Tâches</h1>
+        <Link className="underline" href="/tasks/new">Nouvelle tâche</Link>
       </div>
 
       {loading && <p>Chargement...</p>}
       {error && <p className="text-red-600">{error}</p>}
 
-      {!loading && products.length === 0 && (
-        <p>Aucun produit.</p>
+      {!loading && tasks.length === 0 && (
+        <p>Aucune tâche.</p>
       )}
 
       <ul className="space-y-3">
-        {products.map((p) => (
-          <li key={p.id} className="flex items-center justify-between border p-3 rounded">
+        {tasks.map((t) => (
+          <li key={t.id} className="flex items-center justify-between border p-3 rounded">
             <div>
-              <Link className="font-medium underline" href={`/products/${p.id}`}>{p.name}</Link>
-              <div className="text-sm text-gray-600">{p.price.toFixed(2)} $</div>
+              <Link className="font-medium underline" href={`/tasks/${t.id}`}>#{t.id} - {t.title}</Link>
             </div>
             <div className="flex items-center gap-3">
-              <Link className="underline" href={`/products/${p.id}/edit`}>Modifier</Link>
-              <button onClick={() => handleDelete(p.id)} className="text-red-700">Supprimer</button>
+              <Link className="underline" href={`/tasks/${t.id}/edit`}>Modifier</Link>
+              <button onClick={() => handleDelete(t.id)} className="text-red-700">Supprimer</button>
             </div>
           </li>
         ))}

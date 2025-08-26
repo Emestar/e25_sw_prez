@@ -3,17 +3,24 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 
-type Product = {
+type Task = {
   id: number
   name: string
   price: number
 }
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
+export default function EditTaskPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const [product, setProduct] = useState<Product | null>(null)
-  const [name, setName] = useState("")
-  const [price, setPrice] = useState<string>("")
+  const [task, setTask] = useState<Task | null>(null)
+  const [title, setTitle] = useState("")
+
+  // const [price, setPrice] = useState<string>("")
+
+  const [description, setDescription] = useState("")
+  const [status, setStatus] = useState("")
+  const [priority, setPriority] = useState("")
+  const [dueDate, setDueDate] = useState("")
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -21,12 +28,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`/api/products/${params.id}`)
+        const res = await fetch(`/api/tasks/${params.id}`)
         const json = await res.json()
-        if (!res.ok || json.success !== true) throw new Error(json.error || "Produit introuvable")
-        setProduct(json.data)
-        setName(json.data.name)
-        setPrice(String(json.data.price))
+        if (!res.ok || json.success !== true) throw new Error(json.error || "Tâche introuvable")
+        setTask(json.data)
+        setTitle(json.data.title)
+        // setPrice(String(json.data.price))
       } catch (e: any) {
         setError(e.message)
       } finally {
@@ -41,14 +48,14 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     setSaving(true)
     setError(null)
     try {
-      const res = await fetch(`/api/products/${params.id}`, {
+      const res = await fetch(`/api/tasks/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: name.trim(), price: Number(price) })
       })
       const json = await res.json()
       if (!res.ok || json.success !== true) throw new Error(json.error || "Modification impossible")
-      router.push(`/products/${params.id}`)
+      router.push(`/tasks/${params.id}`)
     } catch (e: any) {
       setError(e.message)
     } finally {
@@ -58,12 +65,12 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   if (loading) return <main className="container mx-auto p-8">Chargement...</main>
   if (error) return <main className="container mx-auto p-8 text-red-700">{error}</main>
-  if (!product) return null
+  if (!task) return null
 
   return (
     <main className="container mx-auto p-8 max-w-lg">
-      <h1 className="text-2xl font-semibold mb-6">Modifier le produit</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <h1 className="text-2xl font-semibold mb-6">Modifier le tâche</h1>
+      {/* <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block mb-1">Nom</label>
           <input className="border rounded w-full p-2" value={name} onChange={(e) => setName(e.target.value)} required />
@@ -76,7 +83,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
         <button disabled={saving} className="bg-black text-white px-4 py-2 rounded">
           {saving ? "Enregistrement..." : "Enregistrer"}
         </button>
-      </form>
+      </form> */}
     </main>
   )
 }
