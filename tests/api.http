@@ -278,22 +278,6 @@ Content-Type: {{contentType}}
   "status": "PENDING"
 }
 
-### ========================================
-### NETTOYAGE FINAL
-### ========================================
 
-### Nettoyer toutes les tâches créées (optionnel)
-### DELETE {{baseUrl}}/api/tasks/1
-### DELETE {{baseUrl}}/api/tasks/2
-### DELETE {{baseUrl}}/api/tasks/3
-### DELETE {{baseUrl}}/api/tasks/4
-### DELETE {{baseUrl}}/api/tasks/5
-### DELETE {{baseUrl}}/api/tasks/6
-### DELETE {{baseUrl}}/api/tasks/7
-### DELETE {{baseUrl}}/api/tasks/8
-### DELETE {{baseUrl}}/api/tasks/9
-
-### Vérification finale
-GET {{baseUrl}}/api/tasks
 
 
