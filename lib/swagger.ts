@@ -26,7 +26,7 @@ const options = {
       schemas: {
         Task: {
           type: 'object',
-          required: ['id', 'title', 'priority', 'status', 'createdAt', 'updatedAt'],
+          required: ['id', 'title', 'priority', 'status', 'createdAt'],
           properties: {
             id: { 
               type: 'integer', 
@@ -66,12 +66,6 @@ const options = {
               format: 'date-time',
               example: '2024-12-15T10:30:00',
               description: 'Date de création automatique'
-            },
-            updatedAt: { 
-              type: 'string', 
-              format: 'date-time',
-              example: '2024-12-15T11:45:00',
-              description: 'Date de dernière modification'
             }
           }
         },

@@ -11,7 +11,6 @@ interface Task {
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED'
   dueDate?: string
   createdAt: string
-  updatedAt: string
 }
 
 // Fonction utilitaire pour formater les dates

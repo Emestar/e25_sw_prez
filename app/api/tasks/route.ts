@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { prisma } from '@/lib/prisma' 
+// import { parseISO, isValid } from 'date-fns'
 
 /**
  * @swagger
@@ -23,6 +24,36 @@ import { prisma } from '@/lib/prisma'
  *                   type: array
  *                   items:
  *                     $ref: '#/components/schemas/Task'
+ *                 message:
+ *                   type: string
+ *                   example: "3 tâche(s) trouvé(s)"
+ *             examples:
+ *               liste_vide:
+ *                 summary: Liste vide
+ *                 value:
+ *                   success: true
+ *                   data: []
+ *                   message: "0 tâche(s) trouvé(s)"
+ *               liste_avec_taches:
+ *                 summary: Liste avec tâches
+ *                 value:
+ *                   success: true
+ *                   data:
+ *                     - id: 1
+ *                       name: "Réviser le cours de Services Web"
+ *                       description: "Relire les chapitres 1 à 5 et faire les exercices pratiques"
+ *                       status: "WIP"
+ *                       priority: "MEDIUM"
+ *                       dueDate: "2024-12-20T19:00:00.000Z"
+ *                       createdAt: "2025-08-27T14:03:59.021Z"
+ *                     - id: 2
+ *                       name: "Pick up dry cleaning"
+ *                       description: "Go to George to pick up suit."
+ *                       status: "DONE"
+ *                       priority: "LOW"
+ *                       dueDate: "2025-07-03T00:00:00.000Z"
+ *                       createdAt: "2025-08-26T14:49:47.812Z"
+ *                   message: "2 tâche(s) trouvé(s)"
  *       500:
  *         description: Erreur serveur
  *         content:
@@ -65,11 +96,18 @@ export async function GET() {
  *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/TaskInput'
- *           example:
- *             title: "Réviser le cours de Services Web"
- *             description: "Relire les chapitres 1 à 5 et faire les exercices pratiques"
- *             priority: "MEDIUM"
- *             dueDate: "2024-12-20T14:00:00"
+ *           examples:
+ *             tache_simple:
+ *               summary: Tâche simple - titre seulement
+ *               value:
+ *                title: "Préparer gâteau pour fête"
+ *             tache_detaillee:
+ *               summary: Tâche détaillée
+ *               value:
+ *                title: "Réviser le cours de Services Web"
+ *                description: "Relire les chapitres 1 à 5 et faire les exercices pratiques"
+ *                priority: "MEDIUM"
+ *                dueDate: "2025-12-20T14:00:00"
  *     responses:
  *       201:
  *         description: Tâche créée avec succès
@@ -83,19 +121,37 @@ export async function GET() {
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Task'
+ *                 message:
+ *                   type: string
+ *                   example: "Tâche créé avec succès"
+ *             example:
+ *               success: true
+ *               data:
+ *                 id: 1
+ *                 title: "Réviser le cours de Services Web"
+ *                 description: "Relire les chapitres 1 à 5 et faire les exercices pratiques"
+ *                 status: ""
+ *                 priority: "MEDIUM"
+ *                 dueDate: "2024-12-20T14:00:00"
+ *                 createdAt: "2024-01-15T10:30:00.000Z"
+ *               message: "Tâche créé avec succès"
  *       400:
  *         description: Données invalides
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: false
- *                 error:
- *                   type: string
- *                   example: Le titre est requis
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *             examples:
+ *               nom_manquant:
+ *                 summary: Nom manquant
+ *                 value:
+ *                   success: false
+ *                   error: "Le titre de la tâche est requis et doit être une chaîne non vide"
+ *               prix_invalide:
+ *                 summary: Prix invalide
+ *                 value:
+ *                   success: false
+ *                   error: "Le prix doit être un nombre positif"
  *       500:
  *         description: Erreur serveur
  *         content:
@@ -123,6 +179,24 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
+
+    // if (dueDate !== undefined && dueDate !== null) {
+    //   if (typeof dueDate !== 'string') {
+    //     return NextResponse.json({ success: false, error: 'dueDate doit être une chaîne ISO (ex: 2025-08-26)' }, { status: 400 })
+    //   }
+    //   // const parsed = parseISO(dueDate)
+    //   // if (!isValid(parsed)) {
+    //   //   return NextResponse.json({ success: false, error: 'dueDate invalide — utilisez un format ISO, ex: 2025-08-26 ou 2025-08-26T15:00:00Z' }, { status: 400 })
+    //   // }
+    // }
+
+    // Créer la tâche
+    // const task = await prisma.task.create({
+    //   data: {
+    //     title: title.trim(),
+    //     description: description,
+    //     status: status,
+    //     priority: priority,
     
     const task = await prisma.task.create({
       data: {
