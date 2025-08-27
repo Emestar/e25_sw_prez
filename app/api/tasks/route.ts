@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+// import { parseISO, isValid } from 'date-fns'
 
 /**
  * @swagger
@@ -7,10 +8,9 @@ import { prisma } from '@/lib/prisma'
  *   get:
  *     summary: Récupérer la liste de tous les tâches
  *     description: |
- *       Retourne la liste complète de tous les tâches enregistrées en base de données,
- *       triés par date de création décroissante (plus récent en premier).
+ *       Retourne la liste complète de tous les tâches enregistrées.
  *     tags:
- *       - tâches
+ *       - Tâches
  *     responses:
  *       200:
  *         description: Liste des tâches récupérée avec succès
@@ -42,15 +42,19 @@ import { prisma } from '@/lib/prisma'
  *                   success: true
  *                   data:
  *                     - id: 1
- *                       name: "iPhone 15 Pro"
- *                       price: 1199.99
+ *                       name: "Cake"
+ *                       description: "Cake for Anna"
+ *                       status: "WIP"
+ *                       priority: "High"
+ *                       dueDate: null
  *                       createdAt: "2024-01-15T10:30:00.000Z"
- *                       updatedAt: "2024-01-15T10:30:00.000Z"
  *                     - id: 2
- *                       name: "MacBook Air M2"
- *                       price: 1299.99
- *                       createdAt: "2024-01-15T10:25:00.000Z"
- *                       updatedAt: "2024-01-15T10:25:00.000Z"
+ *                       name: "Gift"
+ *                       description: "Gift for Mike"
+ *                       status: "WIP"
+ *                       priority: "High"
+ *                       dueDate: "2025-08-27"
+ *                       createdAt: "2024-01-15T10:30:00.000Z"
  *                   message: "2 tâche(s) trouvé(s)"
  *       500:
  *         description: Erreur serveur lors de la récupération
@@ -89,12 +93,12 @@ export async function GET() {
 
 /**
  * @swagger
- * /api/products:
+ * /api/tasks:
  *   post:
- *     summary: Créer un nouveau produit
+ *     summary: Créer un nouveau tâche
  *     description: |
- *       Crée un nouveau produit en base de données après validation des données.
- *       Le nom doit être une chaîne non vide et le prix un nombre positif.
+ *       Crée un nouvelle tâche en base de données après validation des données.
+ *       Le titre doit être une chaîne unique.
  *     tags:
  *       - Tâches
  *     requestBody:
@@ -102,21 +106,23 @@ export async function GET() {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ProductInput'
+ *             $ref: '#/components/schemas/TaskInput'
  *           examples:
- *             produit_simple:
- *               summary: Produit standard
+ *             tache_simple:
+ *               summary: Tâche standard
  *               value:
- *                 name: "iPhone 15 Pro"
- *                 price: 1199.99
- *             produit_economique:
- *               summary: Produit économique
+ *                 title: "Simple task"
+ *             tache_economique:
+ *               summary: Tâche détaillée
  *               value:
- *                 name: "Écouteurs basiques"
- *                 price: 19.99
+ *                 title: "Pick up dry cleaning"
+ *                 description: "Go to George to pick up suit."
+ *                 status: "DONE"
+ *                 priority: "Low"
+ *                 dueDate: "2025-07-03"
  *     responses:
  *       201:
- *         description: Produit créé avec succès
+ *         description: Tâche créée avec succès
  *         content:
  *           application/json:
  *             schema:
@@ -126,7 +132,7 @@ export async function GET() {
  *                   type: boolean
  *                   example: true
  *                 data:
- *                   $ref: '#/components/schemas/Product'
+ *                   $ref: '#/components/schemas/Task'
  *                 message:
  *                   type: string
  *                   example: "Tâche créé avec succès"
@@ -134,10 +140,12 @@ export async function GET() {
  *               success: true
  *               data:
  *                 id: 1
- *                 name: "iPhone 15 Pro"
- *                 price: 1199.99
- *                 createdAt: "2024-01-15T10:30:00.000Z"
- *                 updatedAt: "2024-01-15T10:30:00.000Z"
+ *                 title: "tache 1"
+ *                 description: null
+ *                 status: null
+ *                 priority: null
+ *                 dueDate: null
+ *                 createdAt: "2025-08-26T14:45:46.250Z"
  *               message: "Tâche créé avec succès"
  *       400:
  *         description: Données invalides
@@ -146,16 +154,16 @@ export async function GET() {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  *             examples:
- *               nom_manquant:
+ *               titre_manquant:
  *                 summary: Nom manquant
  *                 value:
  *                   success: false
  *                   error: "Le titre de la tâche est requis et doit être une chaîne non vide"
- *               prix_invalide:
- *                 summary: Prix invalide
+ *               date_invalide:
+ *                 summary: Date invalide
  *                 value:
  *                   success: false
- *                   error: "Le prix doit être un nombre positif"
+ *                   error: "dueDate doit être une chaîne ISO (ex: 2025-08-26)"
  *       500:
  *         description: Erreur serveur lors de la création
  *         content:
@@ -182,17 +190,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // if (dueDate !== undefined && dueDate !== null && dueDate !== '') {
-    //   return NextResponse.json(
-    //     {
-    //       success: false,
-    //       error: 'dueDate doit être une date'
-    //     },
-    //     { status: 400 }
-    //   )
-    // }
+    if (dueDate !== undefined && dueDate !== null) {
+      if (typeof dueDate !== 'string') {
+        return NextResponse.json({ success: false, error: 'dueDate doit être une chaîne ISO (ex: 2025-08-26)' }, { status: 400 })
+      }
+      // const parsed = parseISO(dueDate)
+      // if (!isValid(parsed)) {
+      //   return NextResponse.json({ success: false, error: 'dueDate invalide — utilisez un format ISO, ex: 2025-08-26 ou 2025-08-26T15:00:00Z' }, { status: 400 })
+      // }
+    }
 
-    
     // Créer la tâche
     const task = await prisma.task.create({
       data: {
@@ -200,7 +207,7 @@ export async function POST(request: NextRequest) {
         description: description,
         status: status,
         priority: priority,
-        dueDate: dueDate
+        dueDate: dueDate ? new Date(dueDate) : null
       }
     })
 
