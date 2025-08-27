@@ -2,134 +2,282 @@
 @baseUrl = http://localhost:3000
 @contentType = application/json
 
-### 1. GET - Obtenir tous les tâches (liste vide au début)
+### ========================================
+### TESTS PRINCIPAUX - GESTIONNAIRE DE TÂCHES
+### ========================================
+
+### 1. GET - Obtenir toutes les tâches (liste vide au début)
 GET {{baseUrl}}/api/tasks
 
-### 2. POST - Ajouter le premier tâche
+### 2. POST - Créer la première tâche (priorité moyenne, sans date d'échéance)
 POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
-  "title": "tache 1"
+  "title": "Réviser le cours de Services Web",
+  "description": "Relire les chapitres 1 à 5 et faire les exercices pratiques",
+  "priority": "MEDIUM"
 }
 
-### 3. POST - Ajouter un deuxième tâche - DONT WORK
+### 3. POST - Créer une tâche urgente avec date d'échéance
 POST {{baseUrl}}/api/tasks
 Content-Type: {{contentType}}
 
 {
-    "title": "tache 2",
-    "description": "test",
-    "status": "WIP",
-    "priority": "Haut",
-    "dueDate": "2025-08-27"
+  "title": "Présentation finale du projet",
+  "description": "Préparer la présentation PowerPoint et répéter le discours",
+  "priority": "URGENT",
+  "dueDate": "2024-12-20T14:00:00"
 }
 
-# ### 4. POST - Ajouter un troisième tâche
-# POST {{baseUrl}}/api/tasks
-# Content-Type: {{contentType}}
+### 4. POST - Créer une tâche de faible priorité
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# {
-#   "name": "AirPods Pro",
-#   "price": 279.99
-# }
+{
+  "title": "Organiser le bureau",
+  "description": "Ranger les documents et nettoyer l'espace de travail",
+  "priority": "LOW",
+  "dueDate": "2024-12-25T10:00:00"
+}
 
-# ### 5. GET - Vérifier que tous les tâches sont listés
-# GET {{baseUrl}}/api/tasks
+### 5. POST - Créer une tâche de haute priorité
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# ### 6. GET - Obtenir un tâche par ID (bonus)
-# GET {{baseUrl}}/api/tasks/1
+{
+  "title": "Corriger les bugs de l'application",
+  "description": "Identifier et corriger les erreurs dans le code JavaScript",
+  "priority": "HIGH",
+  "dueDate": "2024-12-18T17:00:00"
+}
 
-# ### 7. PUT - Modifier le premier tâche
-# PUT {{baseUrl}}/api/tasks/1
-# Content-Type: {{contentType}}
+### 6. GET - Vérifier que toutes les tâches sont listées
+GET {{baseUrl}}/api/tasks
 
-# {
-#   "name": "MacBook Air M2 - Edition Spéciale"
-# }
+### 7. GET - Obtenir une tâche par ID
+GET {{baseUrl}}/api/tasks/1
 
-# ### 8. GET - Vérifier que le tâche a été modifié
-# GET {{baseUrl}}/api/tasks/1
+### 8. PUT - Modifier le statut d'une tâche
+PUT {{baseUrl}}/api/tasks/1/status
+Content-Type: {{contentType}}
 
-# ### 9. DELETE - Supprimer le tâche avec ID 2
-# DELETE {{baseUrl}}/api/tasks/2
+{
+  "status": "IN_PROGRESS"
+}
 
-# ### 10. GET - Vérifier que le tâche a été supprimé
-# GET {{baseUrl}}/api/tasks
+### 9. GET - Vérifier que le statut a été modifié
+GET {{baseUrl}}/api/tasks/1
 
-# ### 11. DELETE - Supprimer le tâche avec ID 1
-# DELETE {{baseUrl}}/api/tasks/1
+### 10. PUT - Marquer une tâche comme terminée
+PUT {{baseUrl}}/api/tasks/2/status
+Content-Type: {{contentType}}
 
-# ### 12. DELETE - Supprimer le tâche avec ID 3
-# DELETE {{baseUrl}}/api/tasks/3
+{
+  "status": "COMPLETED"
+}
 
-# ### 13. GET - Vérifier que la liste est vide
-# GET {{baseUrl}}/api/tasks
+### 11. GET - Obtenir les tâches par priorité (HAUTE)
+GET {{baseUrl}}/api/tasks/by-priority?priority=HIGH
 
-# ###
-# ### TESTS D'ERREURS
-# ###
+### 12. GET - Obtenir les tâches par priorité (URGENTE)
+GET {{baseUrl}}/api/tasks/by-priority?priority=URGENT
 
-# ### Erreur 1 - POST sans nom
-# POST {{baseUrl}}/api/tasks
-# Content-Type: {{contentType}}
+### 13. GET - Obtenir les tâches en retard
+GET {{baseUrl}}/api/tasks/Overdue
 
-# {
-#   "price": 999.99
-# }
+### 14. DELETE - Supprimer une tâche
+DELETE {{baseUrl}}/api/tasks/3
 
-# ### Erreur 2 - POST avec prix négatif
-# POST {{baseUrl}}/api/tasks
-# Content-Type: {{contentType}}
+### 15. GET - Vérifier que la tâche a été supprimée
+GET {{baseUrl}}/api/tasks
 
-# {
-#   "name": "Tâche test",
-#   "price": -50
-# }
+### ========================================
+### TESTS D'ERREURS ET VALIDATION
+### ========================================
 
-# ### Erreur 3 - POST avec nom vide
-# POST {{baseUrl}}/api/tasks
-# Content-Type: {{contentType}}
+### Erreur 1 - POST sans titre (champ obligatoire)
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# {
-#   "name": "",
-#   "price": 199.99
-# }
+{
+  "description": "Description sans titre",
+  "priority": "MEDIUM"
+}
 
-# ### Erreur 4 - DELETE avec ID inexistant
-# DELETE {{baseUrl}}/api/tasks/999
+### Erreur 2 - POST avec titre vide
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# ### Erreur 5 - DELETE avec ID invalide
-# DELETE {{baseUrl}}/api/tasks/abc
+{
+  "title": "",
+  "description": "Titre vide",
+  "priority": "MEDIUM"
+}
 
-# ### Erreur 6 - GET avec ID inexistant
-# GET {{baseUrl}}/api/tasks/999
+### Erreur 3 - POST avec priorité invalide
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# ### Erreur 7 - PUT avec ID inexistant
-# PUT {{baseUrl}}/api/tasks/999
-# Content-Type: {{contentType}}
+{
+  "title": "Tâche test",
+  "description": "Test avec priorité invalide",
+  "priority": "INVALID_PRIORITY"
+}
 
-# {
-#   "name": "Tâche inexistant"
-# }
+### Erreur 4 - POST avec date d'échéance invalide
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
 
-# ### Erreur 8 - PUT avec nom vide
-# PUT {{baseUrl}}/api/tasks/1
-# Content-Type: {{contentType}}
+{
+  "title": "Tâche avec date invalide",
+  "description": "Test avec date mal formatée",
+  "priority": "MEDIUM",
+  "dueDate": "date-invalide"
+}
 
-# {
-#   "name": "",
-# }
+### Erreur 5 - GET avec ID inexistant
+GET {{baseUrl}}/api/tasks/999
 
-# ### Erreur 9 - PUT avec prix négatif
-# PUT {{baseUrl}}/api/tasks/1
-# Content-Type: {{contentType}}
+### Erreur 6 - DELETE avec ID inexistant
+DELETE {{baseUrl}}/api/tasks/999
 
-# {
-#   "name": "Tâche test"
-# }
+### Erreur 7 - PUT status avec ID inexistant
+PUT {{baseUrl}}/api/tasks/999/status
+Content-Type: {{contentType}}
 
-# ### 11. Test COUNT - Compter tous les produits
-# GET {{baseUrl}}/api/tasks/count
+{
+  "status": "COMPLETED"
+}
+
+### Erreur 8 - PUT status avec statut invalide
+PUT {{baseUrl}}/api/tasks/1/status
+Content-Type: {{contentType}}
+
+{
+  "status": "INVALID_STATUS"
+}
+
+### Erreur 9 - GET by-priority avec priorité invalide
+GET {{baseUrl}}/api/tasks/by-priority?priority=INVALID
+
+### ========================================
+### TESTS DE SCÉNARIOS RÉALISTES
+### ========================================
+
+### Scénario 1 - Créer plusieurs tâches pour un projet
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Analyse des besoins",
+  "description": "Rencontrer le client et documenter les exigences",
+  "priority": "HIGH",
+  "dueDate": "2024-12-15T16:00:00"
+}
+
+### Scénario 2 - Tâche de suivi
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Développement du backend",
+  "description": "Implémenter les API REST avec Node.js et Express",
+  "priority": "HIGH",
+  "dueDate": "2024-12-22T18:00:00"
+}
+
+### Scénario 3 - Tâche de documentation
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Rédiger la documentation technique",
+  "description": "Créer la documentation API avec Swagger",
+  "priority": "MEDIUM",
+  "dueDate": "2024-12-28T14:00:00"
+}
+
+### Scénario 4 - Tâche de test
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Tests d'intégration",
+  "description": "Exécuter les tests automatisés et corriger les bugs",
+  "priority": "URGENT",
+  "dueDate": "2024-12-19T20:00:00"
+}
+
+### Scénario 5 - Tâche de déploiement
+POST {{baseUrl}}/api/tasks
+Content-Type: {{contentType}}
+
+{
+  "title": "Déploiement en production",
+  "description": "Configurer l'environnement de production et déployer l'application",
+  "priority": "URGENT",
+  "dueDate": "2024-12-30T10:00:00"
+}
+
+### ========================================
+### TESTS DE FILTRAGE ET RECHERCHE
+### ========================================
+
+### Test 1 - Obtenir toutes les tâches pour voir l'état actuel
+GET {{baseUrl}}/api/tasks
+
+### Test 2 - Filtrer par priorité URGENT
+GET {{baseUrl}}/api/tasks/by-priority?priority=URGENT
+
+### Test 3 - Filtrer par priorité HIGH
+GET {{baseUrl}}/api/tasks/by-priority?priority=HIGH
+
+### Test 4 - Filtrer par priorité MEDIUM
+GET {{baseUrl}}/api/tasks/by-priority?priority=MEDIUM
+
+### Test 5 - Filtrer par priorité LOW
+GET {{baseUrl}}/api/tasks/by-priority?priority=LOW
+
+### Test 6 - Vérifier les tâches en retard
+GET {{baseUrl}}/api/tasks/Overdue
+
+### ========================================
+### TESTS DE GESTION DES STATUTS
+### ========================================
+
+### Test 1 - Marquer une tâche comme en cours
+PUT {{baseUrl}}/api/tasks/1/status
+Content-Type: {{contentType}}
+
+{
+  "status": "IN_PROGRESS"
+}
+
+### Test 2 - Marquer une tâche comme terminée
+PUT {{baseUrl}}/api/tasks/2/status
+Content-Type: {{contentType}}
+
+{
+  "status": "COMPLETED"
+}
+
+### Test 3 - Annuler une tâche
+PUT {{baseUrl}}/api/tasks/3/status
+Content-Type: {{contentType}}
+
+{
+  "status": "CANCELLED"
+}
+
+### Test 4 - Remettre une tâche en attente
+PUT {{baseUrl}}/api/tasks/4/status
+Content-Type: {{contentType}}
+
+{
+  "status": "PENDING"
+}
+
+
 
 
