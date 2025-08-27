@@ -1,10 +1,10 @@
-# Commandes laboratoire 2
+# Commandes laboratoire - Gestionnaire de Tâches
 
 ## Installation
 
 ```bash
 git clone [URL_REPO]
-cd laboratoire2
+cd e25_sw_prez
 npm install
 ```
 
@@ -24,27 +24,104 @@ npx prisma db push
 npm run dev
 ```
 
-## Test avec curl
+## Test avec curl (Linux/Mac)
 
 ```bash
-# Ajouter un produit
-curl -X POST http://localhost:3000/api/products \
+# Créer une tâche
+curl -X POST http://localhost:3000/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{"name": "iPhone 15", "price": 999.99}'
+  -d '{
+    "title": "Réviser le cours de Services Web",
+    "description": "Relire les chapitres 1 à 5 et faire les exercices pratiques",
+    "priority": "MEDIUM"
+  }'
 
-# Lister tous les produits
-curl http://localhost:3000/api/products
-
-# Modifier un produit
-curl -X PUT http://localhost:3000/api/products/1 \
+# Créer une tâche urgente avec date d'échéance
+curl -X POST http://localhost:3000/api/tasks \
   -H "Content-Type: application/json" \
-  -d '{"name": "iPhone 15 Pro", "price": 1199.99}'
+  -d '{
+    "title": "Présentation finale du projet",
+    "description": "Préparer la présentation PowerPoint et répéter le discours",
+    "priority": "URGENT",
+    "dueDate": "2024-12-20T14:00:00"
+  }'
 
-# Supprimer un produit
-curl -X DELETE http://localhost:3000/api/products/1
+# Lister toutes les tâches
+curl http://localhost:3000/api/tasks
 
-## Compter les produits
-curl http://localhost:3000/api/products/count
+# Obtenir une tâche par ID
+curl http://localhost:3000/api/tasks/1
+
+# Modifier le statut d'une tâche
+curl -X PUT http://localhost:3000/api/tasks/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "IN_PROGRESS"}'
+
+# Marquer une tâche comme terminée
+curl -X PUT http://localhost:3000/api/tasks/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "COMPLETED"}'
+
+# Supprimer une tâche
+curl -X DELETE http://localhost:3000/api/tasks/1
+
+# Obtenir les tâches par priorité
+curl http://localhost:3000/api/tasks/by-priority?priority=HIGH
+
+# Obtenir les tâches en retard
+curl http://localhost:3000/api/tasks/Overdue
+```
+
+## Test avec PowerShell (Windows)
+
+```powershell
+# Créer une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{
+    "title": "Réviser le cours de Services Web",
+    "description": "Relire les chapitres 1 à 5 et faire les exercices pratiques",
+    "priority": "MEDIUM"
+  }'
+
+# Créer une tâche urgente avec date d'échéance
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{
+    "title": "Présentation finale du projet",
+    "description": "Préparer la présentation PowerPoint et répéter le discours",
+    "priority": "URGENT",
+    "dueDate": "2024-12-20T14:00:00"
+  }'
+
+# Lister toutes les tâches
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET
+
+# Obtenir une tâche par ID
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method GET
+
+# Modifier le statut d'une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "IN_PROGRESS"}'
+
+# Marquer une tâche comme terminée
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "COMPLETED"}'
+
+# Supprimer une tâche
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method DELETE
+
+# Obtenir les tâches par priorité
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/by-priority?priority=HIGH" -Method GET
+
+# Obtenir les tâches en retard
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/Overdue" -Method GET
 ```
 
 ## Test avec fichier .http
@@ -101,39 +178,50 @@ npm install
 ## Structure projet
 
 ```
-laboratoire2/
-├── app/api/products/route.ts     # GET + POST
-├── app/api/products/[id]/route.ts # DELETE
-├── lib/prisma.ts                 # Config Prisma
-├── prisma/schema.prisma          # Modèle données
-├── tests/api.http                # Tests HTTP
-└── .env.local                    # Variables env
+e25_sw_prez/
+├── app/api/tasks/route.ts              # GET + POST
+├── app/api/tasks/[id]/route.ts         # GET + DELETE
+├── app/api/tasks/[id]/status/route.ts  # PUT (modifier statut)
+├── app/api/tasks/by-priority/route.ts  # GET (filtrer par priorité)
+├── app/api/tasks/Overdue/route.ts      # GET (tâches en retard)
+├── lib/prisma.ts                       # Config Prisma
+├── prisma/schema.prisma                # Modèle données
+├── tests/api.http                      # Tests HTTP
+└── .env.local                          # Variables env
 ```
 
 ## Endpoints disponibles
 
 ```
-GET    /api/products      # Lister produits
-POST   /api/products      # Ajouter produit
-PUT    /api/products/[id] # Modifier produit
-DELETE /api/products/[id] # Supprimer produit
-GET    /api/products/[id] # Obtenir produit (bonus)
+GET    /api/tasks                    # Lister toutes les tâches
+POST   /api/tasks                    # Créer une tâche
+GET    /api/tasks/[id]               # Obtenir une tâche
+DELETE /api/tasks/[id]               # Supprimer une tâche
+PUT    /api/tasks/[id]/status        # Modifier le statut
+GET    /api/tasks/by-priority        # Filtrer par priorité
+GET    /api/tasks/Overdue            # Tâches en retard
 ```
 
 ## Format données
 
 ```json
-// POST/PUT body
+// POST body pour créer une tâche
 {
-  "name": "string",
-  "price": number
+  "title": "string (requis)",
+  "description": "string (optionnel)",
+  "priority": "LOW|MEDIUM|HIGH|URGENT (défaut: MEDIUM)",
+  "dueDate": "string (format ISO, optionnel)"
+}
+
+// PUT body pour modifier le statut
+{
+  "status": "PENDING|IN_PROGRESS|COMPLETED|CANCELLED"
 }
 
 // Réponse succès
 {
   "success": true,
-  "data": {...},
-  "message": "string"
+  "data": {...}
 }
 
 // Réponse erreur
@@ -153,9 +241,12 @@ DATABASE_URL="postgresql://user:pass@host.neon.tech/db?sslmode=require"
 ## Validation données
 
 ```
-name: string non vide requis
-price: number positif requis
-id: integer positif pour DELETE
+title: string non vide requis
+description: string optionnel
+priority: enum (LOW, MEDIUM, HIGH, URGENT)
+dueDate: string ISO format optionnel
+status: enum (PENDING, IN_PROGRESS, COMPLETED, CANCELLED)
+id: integer positif pour GET/DELETE/PUT
 ```
 
 ## Codes erreur HTTP
@@ -166,4 +257,90 @@ id: integer positif pour DELETE
 400: Données invalides
 404: Ressource non trouvée
 500: Erreur serveur
+```
+
+## Script de test complet avec curl
+
+Créez un fichier `test-tasks.sh` :
+
+```bash
+#!/bin/bash
+echo "=== Test du Gestionnaire de Tâches ==="
+
+echo "1. Liste initiale (vide):"
+curl -s http://localhost:3000/api/tasks | json_pp
+
+echo -e "\n2. Créer tâche 1:"
+curl -s -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Réviser Services Web", "priority": "MEDIUM"}' | json_pp
+
+echo -e "\n3. Créer tâche 2 (urgente):"
+curl -s -X POST http://localhost:3000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Présentation finale", "priority": "URGENT", "dueDate": "2024-12-20T14:00:00"}' | json_pp
+
+echo -e "\n4. Liste après création:"
+curl -s http://localhost:3000/api/tasks | json_pp
+
+echo -e "\n5. Modifier statut tâche 1:"
+curl -s -X PUT http://localhost:3000/api/tasks/1/status \
+  -H "Content-Type: application/json" \
+  -d '{"status": "IN_PROGRESS"}' | json_pp
+
+echo -e "\n6. Tâches par priorité (URGENT):"
+curl -s http://localhost:3000/api/tasks/by-priority?priority=URGENT | json_pp
+
+echo -e "\n7. Tâches en retard:"
+curl -s http://localhost:3000/api/tasks/Overdue | json_pp
+
+echo -e "\n8. Supprimer tâche 1:"
+curl -s -X DELETE http://localhost:3000/api/tasks/1 | json_pp
+
+echo -e "\n9. Liste finale:"
+curl -s http://localhost:3000/api/tasks | json_pp
+```
+
+## Script de test complet avec PowerShell
+
+Créez un fichier `test-tasks.ps1` :
+
+```powershell
+Write-Host "=== Test du Gestionnaire de Tâches ===" -ForegroundColor Green
+
+Write-Host "1. Liste initiale (vide):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n2. Créer tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"title": "Réviser Services Web", "priority": "MEDIUM"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n3. Créer tâche 2 (urgente):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" `
+  -Method POST `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"title": "Présentation finale", "priority": "URGENT", "dueDate": "2024-12-20T14:00:00"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n4. Liste après création:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n5. Modifier statut tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1/status" `
+  -Method PUT `
+  -Headers @{"Content-Type"="application/json"} `
+  -Body '{"status": "IN_PROGRESS"}' | Select-Object -ExpandProperty Content
+
+Write-Host "`n6. Tâches par priorité (URGENT):" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/by-priority?priority=URGENT" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n7. Tâches en retard:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/Overdue" -Method GET | Select-Object -ExpandProperty Content
+
+Write-Host "`n8. Supprimer tâche 1:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks/1" -Method DELETE | Select-Object -ExpandProperty Content
+
+Write-Host "`n9. Liste finale:" -ForegroundColor Yellow
+Invoke-WebRequest -Uri "http://localhost:3000/api/tasks" -Method GET | Select-Object -ExpandProperty Content
 ```

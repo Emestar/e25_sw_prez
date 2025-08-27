@@ -5,12 +5,9 @@ import { prisma } from '@/lib/prisma'
  * @swagger
  * /api/tasks:
  *   get:
- *     summary: Récupérer la liste de tous les tâches
- *     description: |
- *       Retourne la liste complète de tous les tâches enregistrées en base de données,
- *       triés par date de création décroissante (plus récent en premier).
- *     tags:
- *       - tâches
+ *     summary: Récupérer toutes les tâches
+ *     description: Retourne la liste de toutes les tâches triées par date de création (plus récent en premier)
+ *     tags: [Tâches]
  *     responses:
  *       200:
  *         description: Liste des tâches récupérée avec succès
@@ -25,63 +22,31 @@ import { prisma } from '@/lib/prisma'
  *                 data:
  *                   type: array
  *                   items:
- *                     $ref: '#/components/schemas/task'
- *                 message:
- *                   type: string
- *                   example: "3 tâche(s) trouvé(s)"
- *             examples:
- *               liste_vide:
- *                 summary: Liste vide
- *                 value:
- *                   success: true
- *                   data: []
- *                   message: "0 tâche(s) trouvé(s)"
- *               liste_avec_taches:
- *                 summary: Liste avec tâches
- *                 value:
- *                   success: true
- *                   data:
- *                     - id: 1
- *                       name: "iPhone 15 Pro"
- *                       price: 1199.99
- *                       createdAt: "2024-01-15T10:30:00.000Z"
- *                       updatedAt: "2024-01-15T10:30:00.000Z"
- *                     - id: 2
- *                       name: "MacBook Air M2"
- *                       price: 1299.99
- *                       createdAt: "2024-01-15T10:25:00.000Z"
- *                       updatedAt: "2024-01-15T10:25:00.000Z"
- *                   message: "2 tâche(s) trouvé(s)"
+ *                     $ref: '#/components/schemas/Task'
  *       500:
- *         description: Erreur serveur lors de la récupération
+ *         description: Erreur serveur
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               success: false
- *               error: "Erreur lors de la récupération des tâches"
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Erreur lors de la récupération des tâches
  */
+// GET /api/tasks - Liste des tâches
 export async function GET() {
   try {
     const tasks = await prisma.task.findMany({
-      orderBy: {
-        createdAt: 'desc'
-      }
+      orderBy: { createdAt: 'desc' }
     })
-    
-    return NextResponse.json({
-      success: true,
-      data: tasks,
-      message: `${tasks.length} tâche(s) trouvée(s)`
-    })
+    return NextResponse.json({ success: true, data: tasks })
   } catch (error) {
-    console.error('Erreur lors de la récupération des tâches:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Erreur lors de la récupération des tâches'
-      },
+      { success: false, error: 'Erreur lors de la récupération des tâches' },
       { status: 500 }
     )
   }
@@ -89,34 +54,25 @@ export async function GET() {
 
 /**
  * @swagger
- * /api/products:
+ * /api/tasks:
  *   post:
- *     summary: Créer un nouveau produit
- *     description: |
- *       Crée un nouveau produit en base de données après validation des données.
- *       Le nom doit être une chaîne non vide et le prix un nombre positif.
- *     tags:
- *       - Tâches
+ *     summary: Créer une nouvelle tâche
+ *     description: Crée une nouvelle tâche avec les informations fournies
+ *     tags: [Tâches]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/ProductInput'
- *           examples:
- *             produit_simple:
- *               summary: Produit standard
- *               value:
- *                 name: "iPhone 15 Pro"
- *                 price: 1199.99
- *             produit_economique:
- *               summary: Produit économique
- *               value:
- *                 name: "Écouteurs basiques"
- *                 price: 19.99
+ *             $ref: '#/components/schemas/TaskInput'
+ *           example:
+ *             title: "Réviser le cours de Services Web"
+ *             description: "Relire les chapitres 1 à 5 et faire les exercices pratiques"
+ *             priority: "MEDIUM"
+ *             dueDate: "2024-12-20T14:00:00"
  *     responses:
  *       201:
- *         description: Produit créé avec succès
+ *         description: Tâche créée avec succès
  *         content:
  *           application/json:
  *             schema:
@@ -126,99 +82,61 @@ export async function GET() {
  *                   type: boolean
  *                   example: true
  *                 data:
- *                   $ref: '#/components/schemas/Product'
- *                 message:
- *                   type: string
- *                   example: "Tâche créé avec succès"
- *             example:
- *               success: true
- *               data:
- *                 id: 1
- *                 name: "iPhone 15 Pro"
- *                 price: 1199.99
- *                 createdAt: "2024-01-15T10:30:00.000Z"
- *                 updatedAt: "2024-01-15T10:30:00.000Z"
- *               message: "Tâche créé avec succès"
+ *                   $ref: '#/components/schemas/Task'
  *       400:
  *         description: Données invalides
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             examples:
- *               nom_manquant:
- *                 summary: Nom manquant
- *                 value:
- *                   success: false
- *                   error: "Le titre de la tâche est requis et doit être une chaîne non vide"
- *               prix_invalide:
- *                 summary: Prix invalide
- *                 value:
- *                   success: false
- *                   error: "Le prix doit être un nombre positif"
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Le titre est requis
  *       500:
- *         description: Erreur serveur lors de la création
+ *         description: Erreur serveur
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- *             example:
- *               success: false
- *               error: "Erreur lors de la création de la tâche"
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: string
+ *                   example: Erreur lors de la création de la tâche
  */
+// POST /api/tasks - Créer une tâche
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { title, description, status, priority, dueDate } = body
-
-    // Validation des données
-    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+    const { title, description, priority, dueDate } = body
+    
+    // Validation
+    if (!title || title.trim() === '') {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Le titre de la tâche est requis et doit être une chaîne non vide'
-        },
+        { success: false, error: 'Le titre est requis' },
         { status: 400 }
       )
     }
-
-    // if (dueDate !== undefined && dueDate !== null && dueDate !== '') {
-    //   return NextResponse.json(
-    //     {
-    //       success: false,
-    //       error: 'dueDate doit être une date'
-    //     },
-    //     { status: 400 }
-    //   )
-    // }
-
     
-    // Créer la tâche
     const task = await prisma.task.create({
       data: {
         title: title.trim(),
-        description: description,
-        status: status,
-        priority: priority,
-        dueDate: dueDate
+        description: description?.trim() || null,
+        priority: priority || 'MEDIUM',
+        dueDate: dueDate ? new Date(dueDate) : null
       }
     })
-
-    return NextResponse.json(
-      {
-        success: true,
-        data: task,
-        message: 'Tâche créé avec succès'
-      },
-      { status: 201 }
-    )
+    
+    return NextResponse.json({ success: true, data: task }, { status: 201 })
   } catch (error) {
-    console.error('Erreur lors de la création de la tâche:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: 'Erreur lors de la création du tâche'
-      },
+      { success: false, error: 'Erreur lors de la création de la tâche' },
       { status: 500 }
     )
   }
