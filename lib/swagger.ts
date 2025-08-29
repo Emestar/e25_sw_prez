@@ -4,9 +4,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Laboratoire 2 - API REST',
+      title: 'Gestionnaire de Tâches - API REST',
       version: '1.0.0',
-      description: 'Documentation des services web REST pour la gestion de produits',
+      description: 'Documentation des services web REST pour la gestion de tâches avec priorités, statuts et dates d\'échéance',
       contact: {
         name: 'Équipe de développement',
         email: 'contact@exemple.com'
@@ -14,94 +14,117 @@ const options = {
     },
     servers: [
       {
-        url:'http://localhost:3000',
-        description: 'Serveur de développement'
+        url: ((process as any).env?.NODE_ENV === 'production') 
+          ? 'https://votre-app.vercel.app'
+          : 'http://localhost:3000',
+        description: ((process as any).env?.NODE_ENV === 'production') 
+          ? 'Serveur de production' 
+          : 'Serveur de développement'
       }
     ],
     components: {
       schemas: {
-        Product: {
+        Task: {
           type: 'object',
-          required: ['id', 'name', 'price', 'createdAt', 'updatedAt'],
+          required: ['id', 'title', 'priority', 'status', 'createdAt'],
           properties: {
-            id: {
-              type: 'integer',
-              description: 'Identifiant unique du produit',
-              example: 1
+            id: { 
+              type: 'integer', 
+              example: 1,
+              description: 'Identifiant unique de la tâche'
             },
-            name: {
-              type: 'string',
-              description: 'Nom du produit',
-              example: 'iPhone 15 Pro'
+            title: { 
+              type: 'string', 
+              example: 'Réviser le cours de Services Web',
+              description: 'Titre de la tâche (obligatoire)'
             },
-            price: {
-              type: 'number',
-              format: 'float',
-              description: 'Prix du produit en euros',
-              example: 1199.99
+            description: { 
+              type: 'string', 
+              example: 'Relire les chapitres 1 à 5 et faire les exercices pratiques',
+              description: 'Description détaillée de la tâche (optionnelle)'
             },
-            createdAt: {
-              type: 'string',
+            priority: { 
+              type: 'string', 
+              enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+              example: 'MEDIUM',
+              description: 'Niveau de priorité de la tâche'
+            },
+            status: { 
+              type: 'string', 
+              enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+              example: 'PENDING',
+              description: 'Statut actuel de la tâche'
+            },
+            dueDate: { 
+              type: 'string', 
               format: 'date-time',
-              description: 'Date de création du produit',
-              example: '2024-01-15T10:30:00.000Z'
+              example: '2024-12-20T14:00:00',
+              description: 'Date et heure d\'échéance (optionnelle)'
             },
-            updatedAt: {
-              type: 'string',
+            createdAt: { 
+              type: 'string', 
               format: 'date-time',
-              description: 'Date de dernière modification',
-              example: '2024-01-15T11:45:00.000Z'
+              example: '2024-12-15T10:30:00',
+              description: 'Date de création automatique'
             }
           }
         },
-        ProductInput: {
+        TaskInput: {
           type: 'object',
-          required: ['name', 'price'],
+          required: ['title'],
           properties: {
-            name: {
-              type: 'string',
-              description: 'Nom du produit',
-              example: 'iPhone 15 Pro',
-              minLength: 1
+            title: { 
+              type: 'string', 
+              example: 'Réviser le cours de Services Web',
+              description: 'Titre de la tâche (obligatoire)'
             },
-            price: {
-              type: 'number',
-              format: 'float',
-              description: 'Prix du produit en euros',
-              example: 1199.99,
-              minimum: 0.01
+            description: { 
+              type: 'string', 
+              example: 'Relire les chapitres 1 à 5 et faire les exercices pratiques',
+              description: 'Description détaillée de la tâche (optionnelle)'
+            },
+            priority: { 
+              type: 'string', 
+              enum: ['LOW', 'MEDIUM', 'HIGH', 'URGENT'],
+              example: 'MEDIUM',
+              description: 'Niveau de priorité de la tâche (défaut: MEDIUM)'
+            },
+            dueDate: { 
+              type: 'string', 
+              format: 'date-time',
+              example: '2024-12-20T14:00:00',
+              description: 'Date et heure d\'échéance (optionnelle)'
             }
           }
         },
-        SuccessResponse: {
+        StatusUpdate: {
+          type: 'object',
+          required: ['status'],
+          properties: {
+            status: { 
+              type: 'string', 
+              enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'],
+              example: 'IN_PROGRESS',
+              description: 'Nouveau statut de la tâche'
+            }
+          }
+        },
+        ApiResponse: {
           type: 'object',
           properties: {
-            success: {
-              type: 'boolean',
-              example: true
+            success: { 
+              type: 'boolean', 
+              example: true,
+              description: 'Indique si l\'opération a réussi'
             },
-            data: {
+            data: { 
               type: 'object',
-              description: 'Données de la réponse'
+              description: 'Données de la réponse (en cas de succès)'
             },
-            message: {
+            error: { 
               type: 'string',
-              description: 'Message descriptif',
-              example: 'Opération réussie'
-            }
-          }
-        },
-        ErrorResponse: {
-          type: 'object',
-          properties: {
-            success: {
-              type: 'boolean',
-              example: false
-            },
-            error: {
-              type: 'string',
-              description: 'Message d\'erreur',
-              example: 'Une erreur est survenue'
+              example: 'Erreur lors de la récupération des tâches',
+              description: 'Message d\'erreur (en cas d\'échec)'
             }
           }
         }
