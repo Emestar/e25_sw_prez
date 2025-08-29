@@ -146,12 +146,7 @@ export async function GET() {
  *                 summary: Nom manquant
  *                 value:
  *                   success: false
- *                   error: "Le titre de la tâche est requis et doit être une chaîne non vide"
- *               prix_invalide:
- *                 summary: Prix invalide
- *                 value:
- *                   success: false
- *                   error: "Le prix doit être un nombre positif"
+ *                   error: "Le titre est requis"
  *       500:
  *         description: Erreur serveur
  *         content:
